@@ -19,7 +19,7 @@ namespace GitLogClient
             {
                 // git log query
                 GitLogOperator op = new GitLogOperator();
-                op.Read(@"C:\gitrepo\enterprisesystem");
+                op.Read(@"C:\gitwork\git-log-util");
 
                 // file output
                 GitLogCsv ser = new GitLogCsv();
