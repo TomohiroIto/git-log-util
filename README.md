@@ -9,5 +9,5 @@ This project can be built with Microsoft Visual Studio Commumity 2013.
 
 License
 ----------
-To be determined.
+MIT License.
 
