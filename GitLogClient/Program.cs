@@ -1,14 +1,12 @@
 ﻿using CommandLine.Text;
 using GitLogLib;
+using GitLogLib.Extension;
 using GitLogLib.FileOutput;
-using GitLogLib.FileOutput.Csv;
-using GitLogLib.FileOutput.Json;
 using GitLogLib.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Xml.Serialization;
 
 namespace GitLogClient
 {
@@ -36,23 +34,22 @@ namespace GitLogClient
                 }
 
                 // file output
-                GitLogCsv glCsv = new GitLogCsv();
                 Encoding encoding = Encoding.GetEncoding("UTF-8");
                 using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"a.csv"), false, encoding))
                 {
-                    glCsv.OutputDailyReportCsv(writer, op.LogSumList);
+                    op.OutputDailyReportCsv(writer);
                 }
                 using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"b.csv"), false, encoding))
                 {
-                    glCsv.OutputPivotDataCsv(writer, op.PivotList, op.AuthorList, OutputType.CommitCount);
+                    op.OutputPivotDataCsv(writer, OutputType.CommitCount);
                 }
                 using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"c.csv"), false, encoding))
                 {
-                    glCsv.OutputPivotDataCsv(writer, op.PivotList, op.AuthorList, OutputType.ModifiedRows);
+                    op.OutputPivotDataCsv(writer, OutputType.ModifiedRows);
                 }
                 using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"d.json"), false, encoding))
                 {
-                    new GoogleDataTableJson().OutputGoogleDTJson(writer, op.PivotList, op.AuthorList, OutputType.CommitCount);
+                    op.OutputGoogleDTJson(writer, OutputType.CommitCount);
                 }
 
                 Environment.Exit(0);
