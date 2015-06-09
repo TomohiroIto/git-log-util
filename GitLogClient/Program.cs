@@ -24,7 +24,7 @@ namespace GitLogClient
             {
                 // git log query
                 GitLogOperator op = new GitLogOperator();
-                op.Read(options.GitRepositoryDir);
+                op.Read(options.GitRepositoryDir, options.GitExePath);
 
                 // output directory
                 string outputDir = options.OutputDir;
@@ -39,15 +39,8 @@ namespace GitLogClient
                 {
                     op.OutputDailyReportCsv(writer);
                 }
-                using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"b.csv"), false, encoding))
-                {
-                    op.OutputPivotDataCsv(writer, OutputType.CommitCount);
-                }
-                using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"c.csv"), false, encoding))
-                {
-                    op.OutputPivotDataCsv(writer, OutputType.ModifiedRows);
-                }
-                using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"d.json"), false, encoding))
+
+                using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"b.json"), false, encoding))
                 {
                     op.OutputGoogleDTJson(writer, OutputType.CommitCount);
                 }
@@ -70,6 +63,9 @@ namespace GitLogClient
 
             [CommandLine.Option('o', "output", HelpText = "Output directory for the output.")]
             public string OutputDir { get; set; }
+
+            [CommandLine.Option('g', "git", HelpText = "git.exe full path.")]
+            public string GitExePath { get; set; }
 
             [CommandLine.HelpOption('h', "help", HelpText = "Display this help screen.")]
             public string GetUsage()

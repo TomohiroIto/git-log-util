@@ -38,7 +38,7 @@ namespace GitLogLib
 
         public void Read(string repositoryPath, string gitExePath = null)
         {
-            if (gitExePath == null)
+            if (string.IsNullOrWhiteSpace(gitExePath))
             {
                 gitExePath = GitPathFinder.FindGitPath();
             }
