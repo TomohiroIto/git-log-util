@@ -17,13 +17,14 @@ namespace GitLogLib.FileOutput.Json
             }
 
             writer.Write("{ cols: [");
-            writer.Write(string.Join(",", colList));
-            writer.WriteLine("],");
+            writer.Write(string.Join(", ", colList));
+            writer.Write("], ");
 
-            writer.WriteLine("rows: [");
+            writer.Write("rows: [");
+            bool isFirstLoop = true;
             foreach (GitLogPivotModel pItem in pivotList)
             {
-                writer.Write(string.Format(@"{{c:[{{v: '{0}'}}", pItem.CommitDate));
+                writer.Write((isFirstLoop ? "" : ", ") + string.Format(@"{{c: [{{v: '{0}'}}", pItem.CommitDate));
 
                 for (int i = 0; i < authorList.Count; i++)
                 {
@@ -51,27 +52,11 @@ namespace GitLogLib.FileOutput.Json
                     writer.Write(string.Format(@", {{v: {0}}}", count));
                 }
 
-                writer.WriteLine(@"]}");
+                writer.Write(@"]}");
+                isFirstLoop = false;
             }
 
             writer.Write("]}");
-        }
-
-        private static string getLabelString(OutputType outType)
-        {
-            switch (outType)
-            {
-                case OutputType.CommitCount:
-                    return "Commit Count";
-                case OutputType.ModifiedRows:
-                    return "Modified Rows";
-                case OutputType.AddedRows:
-                    return "Added Rows";
-                case OutputType.DeletedRows:
-                    return "Deleted Rows";
-            }
-
-            return "Count";
         }
     }
 }

@@ -1,14 +1,12 @@
 ﻿using CommandLine.Text;
 using GitLogLib;
+using GitLogLib.Extension;
 using GitLogLib.FileOutput;
-using GitLogLib.FileOutput.Csv;
-using GitLogLib.FileOutput.Json;
 using GitLogLib.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Xml.Serialization;
 
 namespace GitLogClient
 {
@@ -26,7 +24,7 @@ namespace GitLogClient
             {
                 // git log query
                 GitLogOperator op = new GitLogOperator();
-                op.Read(options.GitRepositoryDir);
+                op.Read(options.GitRepositoryDir, options.GitExePath);
 
                 // output directory
                 string outputDir = options.OutputDir;
@@ -36,23 +34,15 @@ namespace GitLogClient
                 }
 
                 // file output
-                GitLogCsv glCsv = new GitLogCsv();
                 Encoding encoding = Encoding.GetEncoding("UTF-8");
                 using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"a.csv"), false, encoding))
                 {
-                    glCsv.OutputDailyReportCsv(writer, op.LogSumList);
+                    op.OutputDailyReportCsv(writer);
                 }
-                using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"b.csv"), false, encoding))
+
+                using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"b.json"), false, encoding))
                 {
-                    glCsv.OutputPivotDataCsv(writer, op.PivotList, op.AuthorList, OutputType.CommitCount);
-                }
-                using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"c.csv"), false, encoding))
-                {
-                    glCsv.OutputPivotDataCsv(writer, op.PivotList, op.AuthorList, OutputType.ModifiedRows);
-                }
-                using (StreamWriter writer = new StreamWriter(Path.Combine(outputDir, @"d.json"), false, encoding))
-                {
-                    new GoogleDataTableJson().OutputGoogleDTJson(writer, op.PivotList, op.AuthorList, OutputType.CommitCount);
+                    op.OutputGoogleDTJson(writer, OutputType.CommitCount);
                 }
 
                 Environment.Exit(0);
@@ -73,6 +63,9 @@ namespace GitLogClient
 
             [CommandLine.Option('o', "output", HelpText = "Output directory for the output.")]
             public string OutputDir { get; set; }
+
+            [CommandLine.Option('g', "git", HelpText = "git.exe full path.")]
+            public string GitExePath { get; set; }
 
             [CommandLine.HelpOption('h', "help", HelpText = "Display this help screen.")]
             public string GetUsage()

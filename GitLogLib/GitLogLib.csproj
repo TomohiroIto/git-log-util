@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension\GitLogOperatorExtensionMethods.cs" />
     <Compile Include="FileOutput\Csv\GitLogCsv.cs" />
     <Compile Include="FileOutput\Json\GoogleDataTableJson.cs" />
     <Compile Include="FileOutput\OutputType.cs" />

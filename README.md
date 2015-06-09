@@ -1,6 +1,6 @@
 git-log-util
 ======================
-git-log-util is a small comandline program for windows to output git log statistics in reusable format.
+git-log-util is a small commandline program for Windows to output git statistics in reusable format.
 
 Build Environment
 ------

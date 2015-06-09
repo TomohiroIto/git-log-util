@@ -5,7 +5,7 @@ using System.IO;
 namespace GitLogLib.FileOutput.Csv
 {
     /// <summary>
-    /// CSV File writer with similar interface like XmlSerializer.
+    /// CSV File writer.
     /// </summary>
     public class GitLogCsv
     {
@@ -17,11 +17,11 @@ namespace GitLogLib.FileOutput.Csv
         /// <param name="sumList"></param>
         public void OutputDailyReportCsv(TextWriter writer, List<GitLogSumModel> sumList)
         {
-            writer.WriteLine("Commit Date,Author,Modified Rows,Commit Count");
+            writer.WriteLine("Commit Date,Author,Added Rows,Deleted Rows,Commit Count");
 
             foreach (GitLogSumModel sum in sumList)
             {
-                writer.WriteLine("{0},\"{1}\",{2},{3}", sum.CommitDate, sum.Author.Replace("\"", ""), sum.Rows, sum.CommitCount);
+                writer.WriteLine("{0},\"{1}\",{2},{3},{4}", sum.CommitDate, sum.Author.Replace("\"", ""), sum.RowsAdded, sum.RowsDeleted, sum.CommitCount);
             }
         }
 
