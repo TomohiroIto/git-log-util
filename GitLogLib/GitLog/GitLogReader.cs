@@ -27,7 +27,7 @@ namespace GitLogLib.GitLog
             psInfo.UseShellExecute = false;
             psInfo.RedirectStandardOutput = true;
             psInfo.WorkingDirectory = gitPath;
-            psInfo.Arguments = @" log --oneline --numstat --no-merges --pretty=format:""<<%an>> <<%ad>>""";
+            psInfo.Arguments = @" log --oneline --date=short --numstat --no-merges --pretty=format:""<<%an>> <<%ad>>""";
             psInfo.EnvironmentVariables.Add("TERM", "msys");
 
             // start git log
@@ -72,7 +72,7 @@ namespace GitLogLib.GitLog
                     name = m.Groups[1].Value;
                     dt = DateTime.ParseExact(
                         m.Groups[2].Value,
-                        "ddd MMM d HH:mm:ss yyyy zzz",
+                        "yyyy-MM-dd",
                         System.Globalization.DateTimeFormatInfo.InvariantInfo);
 
                     commitId += 1;

@@ -5,7 +5,7 @@ using System.Linq;
 namespace GitLogLib.GitLog
 {
     /// <summary>
-    /// class for calculating pivot table like data
+    /// class for calculating GitLogPivotModel list
     /// </summary>
     public class GitLogPivot
     {
@@ -16,31 +16,21 @@ namespace GitLogLib.GitLog
         /// <returns></returns>
         public static List<GitLogPivotModel> CalcPivotTable(List<GitLogSumModel> list)
         {
-            List<GitLogPivotModel> result = new List<GitLogPivotModel>();
-            // LINQ
-            var queryGroups =
+            // make groups by commit date
+            IEnumerable<GitLogPivotModel> q =
                 from item in list
                 group item by new
                 {
-                    CommitDt = item.CommitDate
+                    CommitDate = item.CommitDate
                 } into newGroup
-                orderby newGroup.Key.CommitDt
-                select newGroup;
-
-            foreach (var gp in queryGroups)
-            {
-                GitLogPivotModel pItem = new GitLogPivotModel();
-                pItem.CommitDate = gp.Key.CommitDt;
-
-                foreach (var user in gp)
+                orderby newGroup.Key.CommitDate
+                select new GitLogPivotModel
                 {
-                    pItem.SumList.Add(user.Author, user);
-                }
+                    CommitDate = newGroup.Key.CommitDate,
+                    SumList = newGroup.ToDictionary(p => p.Author)
+                };
 
-                result.Add(pItem);
-            }
-
-            return result;
+            return q.ToList();
         }
     }
 }
