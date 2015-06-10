@@ -16,73 +16,25 @@ namespace GitLogLib.GitLog
         /// <returns></returns>
         public static List<GitLogSumModel> MakeSummary(List<GitLogCommitModel> logs)
         {
-            // make group of each commit
-            var queryGroups =
+            // make groups by author and commit date
+            IEnumerable<GitLogSumModel> q =
                 from item in logs
                 group item by new
                 {
-                    AUTHOR = item.Author,
-                    COMMIT_DT = item.CommitDate,
-                    COMMIT_ID = item.CommitId
+                    Author = item.Author,
+                    CommitDate = item.CommitDate
                 } into newGroup
-                orderby newGroup.Key.COMMIT_DT, newGroup.Key.AUTHOR
-                select newGroup;
-
-            List<GitLogSumModel> resultList = new List<GitLogSumModel>();
-            foreach (var logGroup in queryGroups)
-            {
-                GitLogSumModel sumRow = new GitLogSumModel();
-                sumRow.Author = logGroup.Key.AUTHOR;
-                sumRow.CommitDate = logGroup.Key.COMMIT_DT;
-                sumRow.CommitId = logGroup.Key.COMMIT_ID;
-
-                sumRow.CommitCount = 0;
-                sumRow.RowsAdded = 0;
-                sumRow.RowsDeleted = 0;
-
-                foreach (GitLogCommitModel lg in logGroup)
+                orderby newGroup.Key.CommitDate, newGroup.Key.Author
+                select new GitLogSumModel
                 {
-                    sumRow.RowsAdded += lg.RowsAdded;
-                    sumRow.RowsDeleted += lg.RowsDeleted;
-                    sumRow.CommitCount += 1;
-                }
+                    CommitCount = newGroup.GroupBy(p => p.CommitId).Count(),
+                    Author = newGroup.Key.Author,
+                    CommitDate = newGroup.Key.CommitDate,
+                    RowsAdded = newGroup.Sum(p => p.RowsAdded),
+                    RowsDeleted = newGroup.Sum(p => p.RowsDeleted)
+                };
 
-                resultList.Add(sumRow);
-            }
-
-            // grouping by each author and commit date
-            var qGroupByNmDt =
-                from item in resultList
-                group item by new
-                {
-                    AUTHOR = item.Author,
-                    COMMIT_DT = item.CommitDate
-                } into newGroup
-                orderby newGroup.Key.COMMIT_DT, newGroup.Key.AUTHOR
-                select newGroup;
-
-            resultList = new List<GitLogSumModel>();
-            foreach (var logGroup in qGroupByNmDt)
-            {
-                GitLogSumModel sumRow = new GitLogSumModel();
-                sumRow.Author = logGroup.Key.AUTHOR;
-                sumRow.CommitDate = logGroup.Key.COMMIT_DT;
-
-                sumRow.CommitCount = 0;
-                sumRow.RowsAdded = 0;
-                sumRow.RowsDeleted = 0;
-
-                foreach (GitLogSumModel lg in logGroup)
-                {
-                    sumRow.RowsAdded += lg.RowsAdded;
-                    sumRow.RowsDeleted += lg.RowsDeleted;
-                    sumRow.CommitCount += 1;
-                }
-
-                resultList.Add(sumRow);
-            }
-
-            return resultList;
+            return q.ToList();
         }
     }
 }
