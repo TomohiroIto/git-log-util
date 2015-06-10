@@ -9,19 +9,23 @@ namespace GitLogLib.Util
     /// </summary>
     public class AuthorListUtil
     {
+        /// <summary>
+        /// get a list of authors
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static List<string> GetAuthorList(List<GitLogSumModel> list)
         {
-            List<string> authorList = new List<string>();
-
-            foreach (GitLogSumModel sum in list)
-            {
-                if (!authorList.Contains<string>(sum.Author))
+            // group by author
+            var p =
+                from item in list
+                group item by new
                 {
-                    authorList.Add(sum.Author);
-                }
-            }
+                    Author = item.Author
+                } into authorGroup
+                select authorGroup.Key.Author;
 
-            return authorList;
+            return p.ToList();
         }
     }
 }

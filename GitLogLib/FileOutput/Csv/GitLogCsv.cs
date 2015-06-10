@@ -50,21 +50,7 @@ namespace GitLogLib.FileOutput.Csv
 
                     if (pItem.SumList.ContainsKey(authorList[i]))
                     {
-                        switch (outType)
-                        {
-                            case OutputType.CommitCount:
-                                count = pItem.SumList[authorList[i]].CommitCount;
-                                break;
-                            case OutputType.ModifiedRows:
-                                count = pItem.SumList[authorList[i]].Rows;
-                                break;
-                            case OutputType.AddedRows:
-                                count = pItem.SumList[authorList[i]].RowsAdded;
-                                break;
-                            case OutputType.DeletedRows:
-                                count = pItem.SumList[authorList[i]].RowsDeleted;
-                                break;
-                        }
+                        count = getCountFromModel(pItem.SumList[authorList[i]], outType);
                     }
 
                     writer.Write(",{0}", count);
@@ -72,6 +58,23 @@ namespace GitLogLib.FileOutput.Csv
 
                 writer.WriteLine();
             }
+        }
+
+        private static int getCountFromModel(GitLogSumModel model, OutputType oType)
+        {
+            switch (oType)
+            {
+                case OutputType.CommitCount:
+                    return model.CommitCount;
+                case OutputType.ModifiedRows:
+                    return model.Rows;
+                case OutputType.AddedRows:
+                    return model.RowsAdded;
+                case OutputType.DeletedRows:
+                    return model.RowsDeleted;
+            }
+
+            return 0;
         }
     }
 }
