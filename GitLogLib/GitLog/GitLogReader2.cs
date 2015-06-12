@@ -8,10 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace GitLogLib.GitLog
 {
-    /// <summary>
-    /// git log output parser
-    /// </summary>
-    public class GitLogReader
+    public class GitLogReader2
     {
         /// <summary>
         /// Function to read standard output of git log
@@ -19,7 +16,7 @@ namespace GitLogLib.GitLog
         /// <param name="gitCommand"></param>
         /// <param name="gitPath"></param>
         /// <returns></returns>
-        public static List<GitLogCommitModel> Read(string gitCommand, string gitPath)
+        public static List<GitCommitModel> Read(string gitCommand, string gitPath)
         {
             // git.exe process configulation
             ProcessStartInfo psInfo = new ProcessStartInfo();
@@ -29,12 +26,12 @@ namespace GitLogLib.GitLog
             psInfo.RedirectStandardOutput = true;
             psInfo.StandardOutputEncoding = Encoding.UTF8;
             psInfo.WorkingDirectory = gitPath;
-            psInfo.Arguments = @" log --oneline --date=short --numstat --no-merges --pretty=format:""<<%an>> <<%ad>>""";
+            psInfo.Arguments = @" log --oneline --date=short --numstat --no-merges --pretty=format:""<<%h>> <<%an>> <<%ad>> <<%s>>""";
             psInfo.EnvironmentVariables.Add("TERM", "msys");
 
             // start git log
             Process p = Process.Start(psInfo);
-            List<GitLogCommitModel> result = streamRead(p.StandardOutput);
+            List<GitCommitModel> result = streamRead(p.StandardOutput);
 
             p.StandardOutput.ReadToEnd();
             p.WaitForExit();
@@ -47,16 +44,13 @@ namespace GitLogLib.GitLog
         /// </summary>
         /// <param name="sr"></param>
         /// <returns></returns>
-        private static List<GitLogCommitModel> streamRead(StreamReader sr)
+        private static List<GitCommitModel> streamRead(StreamReader sr)
         {
-            List<GitLogCommitModel> commitList = new List<GitLogCommitModel>();
+            List<GitCommitModel> commitList = new List<GitCommitModel>();
+            GitCommitModel model = null;
 
-            string name = null;
-            DateTime dt = DateTime.Now;
-            int commitId = 0;
-
-            // Regular expression for author and commit date, effected lines
-            Regex r = new Regex("^<<([\\w\\W]+)>> <<([\\w\\W]+)>>$");
+            // Regular expression
+            Regex r = new Regex("^<<([\\w\\W]+)>> <<([\\w\\W]+)>> <<([\\w\\W]+)>> <<([\\w\\W]+)>>$");
             Regex rx = new Regex(@"^([\-\d]+)\t([\-\d]+)\t([^\t]+)$");
 
             string ln;
@@ -71,13 +65,15 @@ namespace GitLogLib.GitLog
                 Match m = r.Match(ln);
                 if (m.Success)
                 {
-                    name = m.Groups[1].Value;
-                    dt = DateTime.ParseExact(
-                        m.Groups[2].Value,
+                    model = new GitCommitModel();
+                    model.CommitId = m.Groups[1].Value;
+                    model.Author = m.Groups[2].Value;
+                    model.CommitDate = DateTime.ParseExact(
+                        m.Groups[3].Value,
                         "yyyy-MM-dd",
-                        System.Globalization.DateTimeFormatInfo.InvariantInfo);
-
-                    commitId += 1;
+                        System.Globalization.DateTimeFormatInfo.InvariantInfo).ToShortDateString();
+                    model.Comment = m.Groups[4].Value;
+                    commitList.Add(model);
                 }
                 else
                 {
@@ -85,15 +81,18 @@ namespace GitLogLib.GitLog
                     Match mx = rx.Match(ln);
                     if (mx.Success)
                     {
+                        // error check
+                        if (model == null)
+                        {
+                            throw new FormatException("Invalid git log output format");
+                        }
+
                         // add to the list
-                        GitLogCommitModel row = new GitLogCommitModel();
-                        row.Author = name;
-                        row.CommitDate = dt.Date.ToShortDateString();
+                        GitCommitSourceModel row = new GitCommitSourceModel();
                         row.RowsAdded = mx.Groups[1].Value == "-" ? 0 : int.Parse(mx.Groups[1].Value);
                         row.RowsDeleted = mx.Groups[2].Value == "-" ? 0 : int.Parse(mx.Groups[2].Value);
                         row.SourceFile = mx.Groups[3].Value;
-                        row.CommitId = commitId.ToString();
-                        commitList.Add(row);
+                        model.SourceList.Add(row);
                     }
                 }
             }
