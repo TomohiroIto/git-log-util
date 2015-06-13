@@ -14,7 +14,7 @@ namespace GitLogLib.GitLog
         /// </summary>
         /// <param name="logs"></param>
         /// <returns></returns>
-        public static List<GitLogSumModel> MakeSummary(List<GitLogCommitModel> logs)
+        public static List<GitLogSumModel> MakeSummary(List<GitCommitModel> logs)
         {
             // make groups by author and commit date
             IEnumerable<GitLogSumModel> q =
@@ -30,8 +30,8 @@ namespace GitLogLib.GitLog
                     CommitCount = newGroup.GroupBy(p => p.CommitId).Count(),
                     Author = newGroup.Key.Author,
                     CommitDate = newGroup.Key.CommitDate,
-                    RowsAdded = newGroup.Sum(p => p.RowsAdded),
-                    RowsDeleted = newGroup.Sum(p => p.RowsDeleted)
+                    RowsAdded = newGroup.Sum(p => p.SourceList.Sum(r => r.RowsAdded)),
+                    RowsDeleted = newGroup.Sum(p => p.SourceList.Sum(r => r.RowsDeleted))
                 };
 
             return q.ToList();

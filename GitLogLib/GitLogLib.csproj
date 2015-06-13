@@ -45,12 +45,9 @@
     <Compile Include="FileOutput\OutputType.cs" />
     <Compile Include="GitLogOperator.cs" />
     <Compile Include="GitLog\GitLogPivot.cs" />
-    <Compile Include="GitLog\GitLogReader2.cs" />
     <Compile Include="GitLog\GitLogSum.cs" />
-    <Compile Include="GitLog\GitLogSum2.cs" />
     <Compile Include="Models\GitCommitModel.cs" />
     <Compile Include="Models\GitCommitSourceModel.cs" />
-    <Compile Include="Models\GitLogCommitModel.cs" />
     <Compile Include="GitLog\GitLogReader.cs" />
     <Compile Include="Models\GitLogSumModel.cs" />
     <Compile Include="Models\GitPivotItem.cs" />

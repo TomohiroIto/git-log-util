@@ -7,12 +7,12 @@ namespace GitLogLib
 {
     public class GitLogOperator
     {
-        private List<GitLogCommitModel> commitList;
+        private List<GitCommitModel> commitList;
         private List<GitLogSumModel> logSumList;
         private List<GitLogPivotModel> pivotList;
         private List<string> authorList;
 
-        public List<GitLogCommitModel> CommitList
+        public List<GitCommitModel> CommitList
         {
             get { return commitList; }
         }
